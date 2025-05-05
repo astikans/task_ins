@@ -30,29 +30,64 @@ Job::Event::Deactivated.create!(
 )
 
 
-# -----------
+# 1st application
+no_status_application = Application.create!(
+  job: active_job,
+  candidate_name: 'John Doe'
+)
 
-#   # Add activation event
-#   Job::Event::Activated.create!(
-#     eventable: job,
-#     properties: { reason: 'Initial job posting' }
-#   )
 
-#   job
-# end
+# 2nd application
+interview_application = Application.create!(
+  job: active_job,
+  candidate_name: 'Jane'
+)
 
-# Create three applications for each job
-created_jobs.each do |job|
-  3.times do |i|
-    application = Application.create!(
-      job: job,
-      candidate_name: "Candidate #{i+1} for #{job.title}",
-    )
+Application::Event::Interview.create!(
+  eventable: interview_application,
+  interview_date: Date.today
+)
 
-    # Since we don't have specific application event types yet,
-    # we can create a generic event if needed in the future
-    # For example: Application::Event::Submitted.create!(eventable: application)
-  end
-end
 
-puts "Created #{created_jobs.size} jobs with #{created_jobs.size * 3} applications!"
+# 3rd application
+hired_application = Application.create!(
+  job: active_job,
+  candidate_name: 'Alan'
+)
+
+Application::Event::Hired.create!(
+  eventable: hired_application,
+  hired_date: Date.today
+)
+
+
+# 4th application
+rejected_application = Application.create!(
+  job: active_job,
+  candidate_name: 'Mary'
+)
+
+# 5th application for deactivated job
+deactivated_job_application = Application.create!(
+  job: deactivated_job,
+  candidate_name: 'John Smith'
+)
+
+Application::Event::Rejected.create!(
+  eventable: rejected_application
+)
+
+# add note
+Application::Event::Note.create!(
+  eventable: interview_application,
+  content: 'This is a note'
+)
+
+# add another note
+Application::Event::Note.create!(
+  eventable: interview_application,
+  content: 'This is another note'
+)
+
+
+puts "Seeding done"
