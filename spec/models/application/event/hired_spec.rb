@@ -21,7 +21,7 @@ RSpec.describe Application::Event::Hired, type: :model do
   end
 
   describe 'behavior' do
-    let(:application) { create(:application, :interviewing) }
+    let(:application) { create(:application, state: "applied") }
     let(:hired_event) { build(:application_event_hired, eventable: application) }
 
     it 'changes the application state to hired when created' do
