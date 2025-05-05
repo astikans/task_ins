@@ -1,18 +1,36 @@
-# Create two jobs
-jobs = [
-  {
-    title: 'Full-Stack Developer',
-    description: 'Looking for an experienced full-stack developer proficient in Ruby on Rails and React.js'
-  },
-  {
-    title: 'DevOps Engineer',
-    description: 'Seeking a DevOps engineer with experience in AWS, Docker, and CI/CD pipelines'
-  }
-]
+# 1st job
+no_state_job = Job.create!(
+  title: 'No State Job',
+  description: 'A job with no state, default should be deactivated'
+)
 
-created_jobs = jobs.map do |job_attrs|
-  job = Job.create!(job_attrs)
-end
+
+# 2nd job
+active_job = Job.create!(
+  title: 'RoR Developer',
+  description: 'Looking for an experienced RoR developer'
+)
+
+Job::Event::Activated.create!(
+  eventable: active_job,
+)
+
+
+# 3rd job
+deactivated_job = Job.create!(
+  title: 'DevOps Engineer',
+  description: 'Seeking a DevOps engineer with experience in AWS'
+)
+
+Job::Event::Activated.create!(
+  eventable: deactivated_job,
+)
+Job::Event::Deactivated.create!(
+  eventable: deactivated_job,
+)
+
+
+# -----------
 
 #   # Add activation event
 #   Job::Event::Activated.create!(
