@@ -38,6 +38,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_05_130639) do
     t.string "title", null: false
     t.text "description", null: false
     t.jsonb "projection", default: {}, null: false
+    t.jsonb "counters", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["projection"], name: "index_jobs_on_projection", using: :gin

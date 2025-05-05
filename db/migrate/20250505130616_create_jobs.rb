@@ -4,6 +4,7 @@ class CreateJobs < ActiveRecord::Migration[8.0]
       t.string :title, null: false
       t.text :description, null: false
       t.jsonb :projection, null: false, default: {}
+      t.jsonb :counters, null: false, default: {}
 
       t.timestamps
     end

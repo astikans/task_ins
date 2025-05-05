@@ -1,6 +1,12 @@
 require 'rails_helper'
 
 RSpec.describe Application, type: :model do
+  describe 'constants' do
+    it 'defines STATES with expected values' do
+      expect(Application::STATES).to eq(%w[interview hired rejected applied])
+    end
+  end
+
   describe 'associations' do
     it { should belong_to(:job) }
     it { should have_many(:events).dependent(:destroy) }
@@ -10,10 +16,20 @@ RSpec.describe Application, type: :model do
     it { should validate_presence_of(:candidate_name) }
   end
 
+  describe 'callbacks' do
+    it 'calls update_counters after commit' do
+      application = build(:application)
+      job = application.job
+
+      expect(job).to receive(:update_counter!)
+      application.save!
+    end
+  end
+
   describe 'store accessors' do
     it 'has state accessor' do
-      application = build(:application, projection: { state: 'submitted' })
-      expect(application.state).to eq('submitted')
+      application = build(:application, projection: { state: 'interview' })
+      expect(application.state).to eq('interview')
     end
 
     it 'has notes_count accessor' do
@@ -34,13 +50,23 @@ RSpec.describe Application, type: :model do
     end
   end
 
+  describe '#update_counters' do
+    it 'calls update_counter! on the associated job' do
+      application = create(:application)
+      job = application.job
+
+      expect(job).to receive(:update_counter!)
+      application.update_counters
+    end
+  end
+
   describe '#update_projection' do
     let(:application) { create(:application) }
 
     context 'when receiving an Interview event' do
       it 'updates state to interview and sets last_interview_date' do
         interview_date = Date.today
-        event = Application::Event::Interview.new(interview_date: interview_date)
+        event = double('Event', type: 'Application::Event::Interview', interview_date: interview_date)
 
         application.update_projection(event)
 
@@ -51,7 +77,7 @@ RSpec.describe Application, type: :model do
 
     context 'when receiving a Hired event' do
       it 'updates state to hired' do
-        event = Application::Event::Hired.new
+        event = double('Event', type: 'Application::Event::Hired')
 
         application.update_projection(event)
 
@@ -61,7 +87,7 @@ RSpec.describe Application, type: :model do
 
     context 'when receiving a Rejected event' do
       it 'updates state to rejected' do
-        event = Application::Event::Rejected.new
+        event = double('Event', type: 'Application::Event::Rejected')
 
         application.update_projection(event)
 
@@ -72,7 +98,7 @@ RSpec.describe Application, type: :model do
     context 'when receiving a Note event' do
       it 'increments notes_count' do
         application.projection = { notes_count: 2 }
-        event = Application::Event::Note.new
+        event = double('Event', type: 'Application::Event::Note')
 
         application.update_projection(event)
 
@@ -81,7 +107,7 @@ RSpec.describe Application, type: :model do
 
       it 'handles nil notes_count' do
         application.projection = { notes_count: nil }
-        event = Application::Event::Note.new
+        event = double('Event', type: 'Application::Event::Note')
 
         application.update_projection(event)
 

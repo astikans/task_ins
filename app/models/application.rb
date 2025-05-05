@@ -1,10 +1,20 @@
 class Application < ApplicationRecord
+  STATES = %w[interview hired rejected applied].freeze
+
   belongs_to :job
   has_many :events, -> { unscope(where: :type) }, as: :eventable, dependent: :destroy
 
   validates :candidate_name, presence: true
 
   store_accessor :projection, :state, :notes_count, :last_interview_date
+
+  default_scope { order(id: :asc) }
+
+  after_commit :update_counters
+
+  def update_counters
+    job.update_counter!
+  end
 
   def update_projection(event)
     case event.type
