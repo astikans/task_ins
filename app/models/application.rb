@@ -6,7 +6,7 @@ class Application < ApplicationRecord
 
   store_accessor :projection, :state, :notes_count, :last_interview_date
 
-  def update_state(event)
+  def update_projection(event)
     case event.type
     when "Application::Event::Interview"
       self.state = "interview"

@@ -9,7 +9,7 @@ class Job < ApplicationRecord
 
   store_accessor :projection, :state
 
-  def update_state(event)
+  def update_projection(event)
     case event.type
     when "Job::Event::Activated"
       self.state = "activated"

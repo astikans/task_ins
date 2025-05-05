@@ -29,8 +29,8 @@ RSpec.describe Event, type: :model do
         event.save!
       end
 
-      it 'calls update_state on the eventable' do
-        expect(job).to receive(:update_state).with(event)
+      it 'calls update_projection on the eventable' do
+        expect(job).to receive(:update_projection).with(event)
         event.save!
       end
     end

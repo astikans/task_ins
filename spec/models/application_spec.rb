@@ -34,7 +34,7 @@ RSpec.describe Application, type: :model do
     end
   end
 
-  describe '#update_state' do
+  describe '#update_projection' do
     let(:application) { create(:application) }
 
     context 'when receiving an Interview event' do
@@ -42,7 +42,7 @@ RSpec.describe Application, type: :model do
         interview_date = Date.today
         event = Application::Event::Interview.new(interview_date: interview_date)
 
-        application.update_state(event)
+        application.update_projection(event)
 
         expect(application.state).to eq('interview')
         expect(application.last_interview_date).to eq(interview_date.to_s)
@@ -53,7 +53,7 @@ RSpec.describe Application, type: :model do
       it 'updates state to hired' do
         event = Application::Event::Hired.new
 
-        application.update_state(event)
+        application.update_projection(event)
 
         expect(application.state).to eq('hired')
       end
@@ -63,7 +63,7 @@ RSpec.describe Application, type: :model do
       it 'updates state to rejected' do
         event = Application::Event::Rejected.new
 
-        application.update_state(event)
+        application.update_projection(event)
 
         expect(application.state).to eq('rejected')
       end
@@ -74,7 +74,7 @@ RSpec.describe Application, type: :model do
         application.projection = { notes_count: 2 }
         event = Application::Event::Note.new
 
-        application.update_state(event)
+        application.update_projection(event)
 
         expect(application.notes_count).to eq(3)
       end
@@ -83,7 +83,7 @@ RSpec.describe Application, type: :model do
         application.projection = { notes_count: nil }
         event = Application::Event::Note.new
 
-        application.update_state(event)
+        application.update_projection(event)
 
         expect(application.notes_count).to eq(1)
       end
