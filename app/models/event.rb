@@ -3,7 +3,7 @@ class Event < ApplicationRecord
 
   validates :type, presence: true
 
-  scope :exclude_job_events, -> { where.not("type LIKE ?", "Job::Event%") }
+  default_scope { order(created_at: :asc) }
 
   after_commit :update_eventable_state, on: :create
 
