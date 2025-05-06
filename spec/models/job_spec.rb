@@ -86,14 +86,14 @@ RSpec.describe Job, type: :model do
     end
   end
 
-  describe '#update_projection' do
+  describe '#update_projection!' do
     let(:job) { create(:job) }
 
     context 'when receiving an Activated event' do
       let(:event) { double('Event', type: 'Job::Event::Activated') }
 
       it 'updates the state to activated' do
-        job.update_projection(event)
+        job.update_projection!(event)
         expect(job.state).to eq('activated')
       end
     end
@@ -102,7 +102,7 @@ RSpec.describe Job, type: :model do
       let(:event) { double('Event', type: 'Job::Event::Deactivated') }
 
       it 'updates the state to deactivated' do
-        job.update_projection(event)
+        job.update_projection!(event)
         expect(job.state).to eq('deactivated')
       end
     end

@@ -17,12 +17,14 @@ class Job < ApplicationRecord
     end
 
     # Count applications with no state and count it as applied
-    self.applied_applications_count = applied_applications_count + applications.where("projection = '{}' OR projection ->> 'state' is NULL").count
+    self.applied_applications_count =
+      applied_applications_count +
+      applications.where("projection = '{}' OR projection ->> 'state' is NULL").count
 
     save!
   end
 
-  def update_projection(event)
+  def update_projection!(event)
     case event.type
     when "Job::Event::Activated"
       self.state = "activated"

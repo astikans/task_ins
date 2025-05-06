@@ -10,6 +10,6 @@ class Event < ApplicationRecord
   private
 
   def update_eventable_state
-    eventable.update_projection(self)
+    eventable.update_projection!(self)
   end
 end

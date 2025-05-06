@@ -16,7 +16,7 @@ class Application < ApplicationRecord
     job.update_counter!
   end
 
-  def update_projection(event)
+  def update_projection!(event)
     case event.type
     when "Application::Event::Interview"
       self.state = "interview"
