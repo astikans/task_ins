@@ -48,6 +48,18 @@ Application::Event::Interview.create!(
   interview_date: Date.today
 )
 
+# add note
+Application::Event::Note.create!(
+  eventable: interview_application,
+  content: 'This is a note'
+)
+
+# add another note
+Application::Event::Note.create!(
+  eventable: interview_application,
+  content: 'This is another note'
+)
+
 
 # 3rd application
 hired_application = Application.create!(
@@ -67,26 +79,19 @@ rejected_application = Application.create!(
   candidate_name: 'Mary'
 )
 
-# 5th application for deactivated job
-deactivated_job_application = Application.create!(
-  job: deactivated_job,
-  candidate_name: 'John Smith'
+Application::Event::Applied.create!(
+  eventable: rejected_application
 )
 
 Application::Event::Rejected.create!(
   eventable: rejected_application
 )
 
-# add note
-Application::Event::Note.create!(
-  eventable: interview_application,
-  content: 'This is a note'
-)
 
-# add another note
-Application::Event::Note.create!(
-  eventable: interview_application,
-  content: 'This is another note'
+# 5th application for deactivated job
+deactivated_job_application = Application.create!(
+  job: deactivated_job,
+  candidate_name: 'John Smith'
 )
 
 
