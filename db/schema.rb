@@ -20,8 +20,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_05_130639) do
     t.jsonb "projection", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index "((projection ->> 'state'::text))", name: "index_applications_on_projection_state"
     t.index ["job_id"], name: "index_applications_on_job_id"
-    t.index ["projection"], name: "index_applications_on_projection", using: :gin
   end
 
   create_table "events", force: :cascade do |t|
@@ -41,7 +41,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_05_05_130639) do
     t.jsonb "counters", default: {}, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["projection"], name: "index_jobs_on_projection", using: :gin
+    t.index "((projection ->> 'state'::text))", name: "index_jobs_on_projection_state"
   end
 
   add_foreign_key "applications", "jobs"

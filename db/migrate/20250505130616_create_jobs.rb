@@ -9,6 +9,6 @@ class CreateJobs < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :jobs, :projection, using: :gin
+    add_index :jobs, "(projection ->> 'state')"
   end
 end

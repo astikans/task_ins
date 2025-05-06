@@ -8,6 +8,6 @@ class CreateApplications < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :applications, :projection, using: :gin
+    add_index :applications, "(projection ->> 'state')"
   end
 end
