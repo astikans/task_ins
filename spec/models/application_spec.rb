@@ -16,6 +16,19 @@ RSpec.describe Application, type: :model do
     it { should validate_presence_of(:candidate_name) }
   end
 
+  describe 'scopes' do
+    describe 'default_scope' do
+      it 'orders by id ascending' do
+        job = create(:job)
+        app3 = create(:application, job: job)
+        app1 = create(:application, job: job)
+        app2 = create(:application, job: job)
+
+        expect(Application.all).to eq([ app3, app1, app2 ])
+      end
+    end
+  end
+
   describe 'callbacks' do
     it 'calls update_counters after commit' do
       application = build(:application)

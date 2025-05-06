@@ -55,6 +55,26 @@ RSpec.describe Job, type: :model do
   describe '#update_counter!' do
     let(:job) { create(:job) }
 
+    context 'with applications in different states' do
+      before do
+        create(:application, job: job, state: 'applied')
+        create(:application, job: job, state: 'interview')
+        create(:application, job: job, state: 'hired')
+        create(:application, job: job, state: 'rejected')
+        create(:application, job: job, projection: {}) # No state
+        create(:application, job: job, projection: { notes_count: 0 }) # No state
+      end
+
+      it 'updates the counters correctly' do
+        job.update_counter!
+
+        expect(job.applied_applications_count).to eq(3) # 1 with state 'applied' and 2 with no state
+        expect(job.interview_applications_count).to eq(1)
+        expect(job.hired_applications_count).to eq(1)
+        expect(job.rejected_applications_count).to eq(1)
+      end
+    end
+
     context 'with no applications' do
       it 'sets all counters to zero' do
         job.update_counter!
