@@ -79,8 +79,9 @@ rejected_application = Application.create!(
   candidate_name: 'Mary'
 )
 
-Application::Event::Applied.create!(
-  eventable: rejected_application
+Application::Event::Interview.create!(
+  eventable: rejected_application,
+  interview_date: Date.today
 )
 
 Application::Event::Rejected.create!(
