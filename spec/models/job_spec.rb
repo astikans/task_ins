@@ -11,6 +11,25 @@ RSpec.describe Job, type: :model do
     it { should validate_presence_of(:description) }
   end
 
+  describe 'initialization' do
+    it 'sets default state to deactivated' do
+      job = Job.new
+      expect(job.state).to eq('deactivated')
+    end
+
+    it 'initializes all application state counters to zero' do
+      job = Job.new
+      Application::STATES.each do |state|
+        expect(job.send("#{state}_applications_count")).to eq(0)
+      end
+    end
+
+    it 'allows overriding default state' do
+      job = Job.new(state: 'activated')
+      expect(job.state).to eq('activated')
+    end
+  end
+
   describe 'attributes' do
     it { should respond_to(:state) }
 
@@ -19,8 +38,8 @@ RSpec.describe Job, type: :model do
     end
 
     it 'uses store_accessor for state' do
-      job = create(:job, state: 'active')
-      expect(job.state).to eq('active')
+      job = create(:job, state: 'activated')
+      expect(job.state).to eq('activated')
     end
   end
 
@@ -61,14 +80,22 @@ RSpec.describe Job, type: :model do
         create(:application, job: job, state: 'interview')
         create(:application, job: job, state: 'hired')
         create(:application, job: job, state: 'rejected')
-        create(:application, job: job, projection: {}) # No state
-        create(:application, job: job, projection: { notes_count: 0 }) # No state
       end
 
       it 'updates the counters correctly' do
         job.update_counter!
 
-        expect(job.applied_applications_count).to eq(3) # 1 with state 'applied' and 2 with no state
+        expect(job.applied_applications_count).to eq(1)
+        expect(job.interview_applications_count).to eq(1)
+        expect(job.hired_applications_count).to eq(1)
+        expect(job.rejected_applications_count).to eq(1)
+      end
+
+      it 'persists the changes to the database' do
+        job.update_counter!
+        job.reload
+
+        expect(job.applied_applications_count).to eq(1)
         expect(job.interview_applications_count).to eq(1)
         expect(job.hired_applications_count).to eq(1)
         expect(job.rejected_applications_count).to eq(1)
@@ -78,6 +105,15 @@ RSpec.describe Job, type: :model do
     context 'with no applications' do
       it 'sets all counters to zero' do
         job.update_counter!
+
+        Application::STATES.each do |state|
+          expect(job.send("#{state}_applications_count")).to eq(0)
+        end
+      end
+
+      it 'persists zero counters to the database' do
+        job.update_counter!
+        job.reload
 
         Application::STATES.each do |state|
           expect(job.send("#{state}_applications_count")).to eq(0)
@@ -96,6 +132,12 @@ RSpec.describe Job, type: :model do
         job.update_projection!(event)
         expect(job.state).to eq('activated')
       end
+
+      it 'persists the state change' do
+        job.update_projection!(event)
+        job.reload
+        expect(job.state).to eq('activated')
+      end
     end
 
     context 'when receiving a Deactivated event' do
@@ -103,6 +145,12 @@ RSpec.describe Job, type: :model do
 
       it 'updates the state to deactivated' do
         job.update_projection!(event)
+        expect(job.state).to eq('deactivated')
+      end
+
+      it 'persists the state change' do
+        job.update_projection!(event)
+        job.reload
         expect(job.state).to eq('deactivated')
       end
     end

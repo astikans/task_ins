@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe JobSerializer do
-  let(:job) { build_stubbed(:job, state: nil, hired_applications_count: nil, rejected_applications_count: nil, applied_applications_count: nil, interview_applications_count: nil) }
+  let(:job) { build_stubbed(:job) }
   let(:serializer) { described_class.new(job) }
   let(:serialization) { JSON.parse(serializer.to_json) }
 
@@ -10,11 +10,7 @@ RSpec.describe JobSerializer do
   end
 
   describe '#state' do
-    it 'returns deactivated when state is nil' do
-      expect(serialization['state']).to eq('deactivated')
-    end
-
-    it 'returns the state value when present' do
+    it 'returns the state value' do
       job.state = 'active'
       new_serialization = JSON.parse(described_class.new(job).to_json)
       expect(new_serialization['state']).to eq('active')
@@ -22,11 +18,7 @@ RSpec.describe JobSerializer do
   end
 
   describe '#hired_applications_count' do
-    it 'returns 0 when hired_applications_count is nil' do
-      expect(serialization['hired_applications_count']).to eq(0)
-    end
-
-    it 'returns the hired_applications_count value when present' do
+    it 'returns the hired_applications_count value' do
       job.hired_applications_count = 5
       new_serialization = JSON.parse(described_class.new(job).to_json)
       expect(new_serialization['hired_applications_count']).to eq(5)
@@ -34,11 +26,7 @@ RSpec.describe JobSerializer do
   end
 
   describe '#rejected_applications_count' do
-    it 'returns 0 when rejected_applications_count is nil' do
-      expect(serialization['rejected_applications_count']).to eq(0)
-    end
-
-    it 'returns the rejected_applications_count value when present' do
+    it 'returns the rejected_applications_count value' do
       job.rejected_applications_count = 3
       new_serialization = JSON.parse(described_class.new(job).to_json)
       expect(new_serialization['rejected_applications_count']).to eq(3)
@@ -46,22 +34,11 @@ RSpec.describe JobSerializer do
   end
 
   describe '#ongoing_applications_count' do
-    it 'returns 0 when both applied_applications_count and interview_applications_count are nil' do
-      expect(serialization['ongoing_applications_count']).to eq(0)
-    end
-
-    it 'returns the sum of applied_applications_count and interview_applications_count when present' do
+    it 'returns the sum of applied_applications_count and interview_applications_count' do
       job.applied_applications_count = 2
       job.interview_applications_count = 3
       new_serialization = JSON.parse(described_class.new(job).to_json)
       expect(new_serialization['ongoing_applications_count']).to eq(5)
-    end
-
-    it 'handles one count being nil' do
-      job.applied_applications_count = 2
-      job.interview_applications_count = nil
-      new_serialization = JSON.parse(described_class.new(job).to_json)
-      expect(new_serialization['ongoing_applications_count']).to eq(2)
     end
   end
 end

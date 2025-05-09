@@ -11,15 +11,19 @@ class Job < ApplicationRecord
   store_accessor :projection, :state
   store_accessor :counters, *Application::STATES.map { |state| "#{state}_applications_count" }
 
+  def initialize(attributes = nil)
+    super
+    self.state ||= "deactivated" # default state
+    Application::STATES.each do |state|
+      self.send("#{state}_applications_count=", 0) # default counters
+    end
+  end
+
   def update_counter!
     Application::STATES.each do |state|
-      self.send("#{state}_applications_count=", applications.where("projection ->> 'state' = ?", state).count)
+      counts = applications.group("projection ->> 'state'").count
+      self.send("#{state}_applications_count=", counts[state] || 0)
     end
-
-    # Count applications with no state and count it as applied
-    self.applied_applications_count =
-      applied_applications_count +
-      applications.where("projection = '{}' OR projection ->> 'state' is NULL").count
 
     save!
   end
