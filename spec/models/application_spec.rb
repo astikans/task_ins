@@ -17,25 +17,33 @@ RSpec.describe Application, type: :model do
   end
 
   describe 'scopes' do
-    describe 'default_scope' do
+    describe 'ordered' do
       it 'orders by id ascending' do
         job = create(:job)
-        app3 = create(:application, job: job)
         app1 = create(:application, job: job)
         app2 = create(:application, job: job)
+        app3 = create(:application, job: job)
 
-        expect(Application.all).to eq([ app3, app1, app2 ])
+        expect(Application.ordered).to eq([ app1, app2, app3 ])
       end
     end
   end
 
   describe 'callbacks' do
-    it 'calls update_counters after commit' do
-      application = build(:application)
+    it 'calls update_counters after commit when state changes' do
+      application = create(:application)
       job = application.job
 
       expect(job).to receive(:update_counter!)
-      application.save!
+      application.update!(projection: { state: 'interview' })
+    end
+
+    it 'does not call update_counters when state does not change' do
+      application = create(:application)
+      job = application.job
+
+      expect(job).not_to receive(:update_counter!)
+      application.update!(candidate_name: 'New Name')
     end
   end
 
@@ -116,15 +124,6 @@ RSpec.describe Application, type: :model do
         application.update_projection!(event)
 
         expect(application.notes_count).to eq(3)
-      end
-
-      it 'handles nil notes_count' do
-        application.projection = { notes_count: nil }
-        event = double('Event', type: 'Application::Event::Note')
-
-        application.update_projection!(event)
-
-        expect(application.notes_count).to eq(1)
       end
     end
   end

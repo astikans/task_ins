@@ -8,9 +8,15 @@ class Application < ApplicationRecord
 
   store_accessor :projection, :state, :notes_count, :last_interview_date
 
-  default_scope { order(id: :asc) }
+  scope :ordered, -> { order(id: :asc) }
 
-  after_commit :update_counters
+  after_commit :update_counters, if: :saved_change_to_state?
+
+  def initialize(attributes = nil)
+    super
+    self.state ||= "applied" # default state
+    self.notes_count ||= 0 # default notes count
+  end
 
   def update_counters
     job.update_counter!
@@ -26,7 +32,7 @@ class Application < ApplicationRecord
     when "Application::Event::Rejected"
       self.state = "rejected"
     when "Application::Event::Note"
-      self.notes_count = (notes_count || 0) + 1
+      self.notes_count += 1
     end
 
     save!

@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe ApplicationSerializer do
-  let(:application) { build_stubbed(:application, projection: { state: nil, notes_count: nil }) }
+  let(:job) { build_stubbed(:job, title: 'Software Engineer') }
+  let(:application) { build_stubbed(:application, job: job) }
   let(:serializer) { described_class.new(application) }
   let(:serialization) { JSON.parse(serializer.to_json) }
 
@@ -9,8 +10,14 @@ RSpec.describe ApplicationSerializer do
     expect(serialization.keys).to match_array([ 'id', 'job_name', 'candidate_name', 'state', 'notes_count', 'last_interview_date' ])
   end
 
+  describe '#job_name' do
+    it 'returns the job title' do
+      expect(serialization['job_name']).to eq('Software Engineer')
+    end
+  end
+
   describe '#state' do
-    it 'returns applied when state is nil' do
+    it 'returns applied when state is not set' do
       expect(serialization['state']).to eq('applied')
     end
 

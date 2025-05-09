@@ -4,12 +4,4 @@ class ApplicationSerializer < ActiveModel::Serializer
   def job_name
     object.job.title
   end
-
-  def state
-    object.state || "applied"
-  end
-
-  def notes_count
-    object.notes_count || 0
-  end
 end
