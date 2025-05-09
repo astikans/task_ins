@@ -74,13 +74,13 @@ t.index ["job_id"], name: "index_applications_on_job_id"
 
 ## Tests
 
-App has 80 unit tests and controller tests.
+App has 83 unit tests and controller tests.
 
 Run: `bundle exec rspec spec`
 ```
 ................................................................................
 
-80 examples, 0 failures
+83 examples, 0 failures
 ```
 
 ## Test data
